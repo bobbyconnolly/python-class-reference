@@ -282,6 +282,83 @@ formatted = template.format(name, age)   <span class="comment"># Same result!</s
             file.close()</div>
     </div>
 
+<div class="section">
+    <h2>Numeric Validation and Calculations</h2>
+    <div class="explanation">
+        When working with prices, percentages, and quantities, proper validation and calculation patterns are essential.
+    </div>
+    <div class="code-block">
+<span class="keyword">class</span> Product:
+    <span class="keyword">def</span> __init__(self, price, quantity):
+        self._price = 0
+        self._quantity = 0
+        self.price = price      <span class="comment"># Uses property setter</span>
+        self.quantity = quantity
+
+    <span class="decorator">@property</span>
+    <span class="keyword">def</span> price(self):
+        <span class="keyword">return</span> self._price
+
+    <span class="decorator">@price.setter</span>
+    <span class="keyword">def</span> price(self, value):
+        <span class="keyword">if not</span> isinstance(value, (int, float)) or value < 0:
+            <span class="keyword">raise</span> ValueError("Price must be a positive number")
+        self._price = float(value)  <span class="comment"># Convert to float for currency</span>
+
+    <span class="keyword">def</span> calculate_total(self, discount_percent=0):
+        <span class="keyword">if not</span> 0 <= discount_percent <= 100:
+            <span class="keyword">raise</span> ValueError("Discount must be between 0 and 100")
+        
+        subtotal = self.price * self.quantity
+        discount = subtotal * (discount_percent / 100)
+        <span class="keyword">return</span> subtotal - discount</div>
+
+    <div class="tip">
+        💡 When dealing with currency:
+        <ul>
+            <li>Store as float for precise calculations</li>
+            <li>Format with f'{amount:.2f}' for display</li>
+            <li>Use percentage calculations with (percent / 100)</li>
+        </ul>
+    </div>
+</div>
+
+<div class="section">
+    <h2>Dictionary as Data Store</h2>
+    <div class="code-block">
+<span class="comment"># Dictionary of dictionaries pattern</span>
+inventory = {
+    "item1": {
+        "price": 29.99,
+        "quantity": 10,
+        "category": "books"
+    }
+}
+
+<span class="comment"># Safe dictionary operations</span>
+<span class="keyword">def</span> update_inventory(item_id, **updates):
+    <span class="keyword">if</span> item_id <span class="keyword">not in</span> inventory:
+        <span class="keyword">return</span> False
+    
+    inventory[item_id].update(updates)
+    <span class="keyword">return</span> True
+
+<span class="comment"># Calculating totals from dictionary</span>
+total_value = sum(
+    item["price"] * item["quantity"]
+    <span class="keyword">for</span> item <span class="keyword">in</span> inventory.values()
+)</div>
+
+    <div class="tip">
+        💡 Dictionary tips:
+        <ul>
+            <li>Use .get() with default for safe access</li>
+            <li>Use .update() to modify multiple values</li>
+            <li>Use dict comprehension for transformations</li>
+        </ul>
+    </div>
+</div>
+
     <div class="section">
         <h2>Common String Methods</h2>
         <div class="explanation">
