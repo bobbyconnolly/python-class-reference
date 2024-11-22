@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body {
+        font-family: system-ui, -apple-system, sans-serif;
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 0 20px;
+        color: #24292f;
+    }
+    .section {
+        margin-bottom: 30px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    .keyword { color: #0550ae; font-weight: bold; }
+    .string { color: #0a3069; }
+    .comment { color: #6e7781; font-style: italic; }
+    .decorator { color: #953800; }
+    .code-block {
+        background: #f6f8fa;
+        padding: 15px;
+        border-radius: 6px;
+        font-family: monospace;
+        white-space: pre;
+        overflow-x: auto;
+        margin: 10px 0;
+    }
+    h2 { 
+        color: #24292f;
+        border-bottom: 2px solid #d0d7de;
+        padding-bottom: 8px;
+    }
+    .explanation {
+        background: #ddf4ff;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 10px 0;
+    }
+    .new-concept {
+        background: #fff4e5;
+        padding: 10px;
+        border-left: 4px solid #dd8e00;
+        margin: 10px 0;
+    }
+    .tip {
+        background: #dafbe1;
+        padding: 10px;
+        border-left: 4px solid #1a7f37;
+        margin: 10px 0;
+    }
+    @media (max-width: 600px) {
+        body {
+            padding: 10px;
+            background: white;
+        }
+        .section {
+            background: white;
+            width: 100%;    
+            max-width: 100%;
+            margin: 0;
+            padding: 0; 
+            box-shadow: none;
+        }
+    }
+</style>
+</head>
+<body>
+    <h1>Python Class Reference Sheet</h1>
+
+    <div class="section">
+        <h2>Class Definition Basics</h2>
+        <div class="explanation">
+            A class is like a blueprint for creating objects. <strong>Attributes</strong> are variables that belong to the object - they store the object's data. The <code>self</code> parameter refers to the specific instance of the class being created or modified.
+            
+            Attributes can store any type of data: numbers, strings, lists, dictionaries, dates, or even other objects!
+        </div>
+        <div class="code-block">
+<span class="keyword">class</span> ClassName:
+    <span class="keyword">def</span> __init__(self, param1, param2):
+        <span class="comment"># These are instance attributes</span>
+        self.param1 = param1              <span class="comment"># Could be a string</span>
+        self.param2 = param2              <span class="comment"># Could be a number</span>
+        self.contacts = []                <span class="comment"># An empty list</span>
+        self.info = {}                    <span class="comment"># An empty dictionary</span>
+        self.created_at = datetime.now()  <span class="comment"># A datetime object</span></div>
+    </div>
+
+    <div class="section">
+        <h2>Properties</h2>
+        <div class="explanation">
+            Properties let us control how attributes are get and set. Even though we use them like normal attributes in our code, they're actually backed by methods! This gives us control over validation and calculations.
+        </div>
+        <div class="code-block">
+<span class="keyword">class</span> Example:
+    <span class="decorator">@property</span>
+    <span class="keyword">def</span> name(self):           <span class="comment"># This runs when we READ the name</span>
+        <span class="keyword">return</span> self._name
+
+    <span class="decorator">@name.setter</span>
+    <span class="keyword">def</span> name(self, value):    <span class="comment"># This runs when we WRITE the name</span>
+        <span class="keyword">if not</span> isinstance(value, str):
+            <span class="keyword">raise</span> ValueError("Name must be a string")
+        self._name = value
+
+<span class="comment"># Using the property (looks like a normal attribute!):</span>
+example = Example()
+example.name = "John"     <span class="comment"># Calls the setter method</span>
+print(example.name)       <span class="comment"># Calls the getter method</span></div>
+    </div>
+
+
+    <div class="section">
+        <h2>Class Methods</h2>
+        <div class="explanation">
+            Methods are functions that belong to a class. They define what an object can <em>do</em> with its data. By combining data (attributes) and behavior (methods) into one class, we create a self-contained unit that handles one specific responsibility in our application.
+        </div>
+        
+        <div class="new-concept">
+            <strong>Object-Oriented Design Tip:</strong> When designing a class, think "What is this class responsible for?" Every method should relate to that single responsibility. For example, a MedicalAppointment class should only handle appointment-related operations, not general patient records or billing.
+        </div>
+
+        <div class="code-block">
+<span class="keyword">class</span> MedicalAppointment:
+    <span class="keyword">def</span> __init__(self, start_time, duration_mins):
+        self.start_time = start_time
+        self.duration_mins = duration_mins
+        self.status = "scheduled"
+        self.notes = []
+    
+    <span class="comment"># Method that performs a calculation</span>
+    <span class="keyword">def</span> get_end_time(self):
+        <span class="keyword">return</span> self.start_time + timedelta(minutes=self.duration_mins)
+    
+    <span class="comment"># Method that modifies the object's state</span>
+    <span class="keyword">def</span> cancel_appointment(self):
+        <span class="keyword">if</span> self.status == "completed":
+            <span class="keyword">raise</span> ValueError("Cannot cancel completed appointment")
+        self.status = "cancelled"
+    
+    <span class="comment"># Method that adds data</span>
+    <span class="keyword">def</span> add_note(self, note):
+        self.notes.append({
+            "timestamp": datetime.now(),
+            "text": note
+        })
+    
+    <span class="comment"># Method that checks conditions</span>
+    <span class="keyword">def</span> conflicts_with(self, other_appointment):
+        my_end = self.get_end_time()
+        other_end = other_appointment.get_end_time()
+        
+        <span class="keyword">return</span> (self.start_time <= other_appointment.start_time < my_end) or \
+               (other_appointment.start_time <= self.start_time < other_end)</div>
+
+        <div class="explanation">
+            Notice how each method above serves a specific purpose:
+            <ul>
+                <li><code>get_end_time()</code>: Calculates derived data</li>
+                <li><code>cancel_appointment()</code>: Manages appointment state</li>
+                <li><code>add_note()</code>: Handles appointment documentation</li>
+                <li><code>conflicts_with()</code>: Checks scheduling logic</li>
+            </ul>
+            Together, these methods encapsulate all the behaviors related to managing a medical appointment.
+        </div>
+
+        <div class="code-block">
+<span class="comment"># Using the class</span>
+appointment = MedicalAppointment(
+    start_time=datetime(2024, 3, 15, 14, 30),
+    duration_mins=30
+)
+
+<span class="comment"># Using methods to work with the appointment</span>
+appointment.add_note("Patient requested morning appointments in future")
+end_time = appointment.get_end_time()
+
+<span class="comment"># Check for conflicts</span>
+other_appointment = MedicalAppointment(
+    start_time=datetime(2024, 3, 15, 14, 45),
+    duration_mins=30
+)
+if appointment.conflicts_with(other_appointment):
+    print("Schedule conflict detected!")</div>
+
+        <div class="tip">
+            💡 When designing methods, ask yourself:
+            <ul>
+                <li>Does this behavior logically belong to this class?</li>
+                <li>Does the method name clearly describe what it does?</li>
+                <li>Is the method using the object's data (if not, maybe it should be a standalone function)?</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Working with Datetime</h2>
+        <div class="explanation">
+            The datetime module helps us work with dates and times. For appointments, we need to:
+            1. Store when appointments start
+            2. Calculate when they end
+            3. Check for scheduling conflicts
+        </div>
+        <div class="code-block">
+<span class="keyword">from</span> datetime <span class="keyword">import</span> datetime, timedelta
+
+<span class="comment"># Create a specific date and time</span>
+appointment = datetime(2024, 3, 15, 14, 30)  <span class="comment"># March 15, 2024, 2:30 PM</span>
+
+<span class="comment"># Add duration</span>
+duration = timedelta(minutes=30)
+end_time = appointment + duration
+
+<span class="comment"># Compare times</span>
+if end_time > datetime.now():
+    print("Appointment is in the future")</div>
+    </div>
+
+    <div class="section">
+        <h2>Dictionary Operations</h2>
+        <div class="explanation">
+            Dictionaries store key-value pairs. There are two ways to get values:
+            1. Square brackets [...] - raises an error if key doesn't exist
+            2. .get() method - returns None (or a default value) if key doesn't exist
+        </div>
+        <div class="code-block">
+info = {
+    "phone": "555-0123",
+    "email": "patient@example.com"
+}
+
+<span class="comment"># Method 1: Square brackets (might raise KeyError)</span>
+try:
+    phone = info["phone"]
+except KeyError:
+    print("No phone number found")
+
+<span class="comment"># Method 2: get() (safer, returns None if not found)</span>
+phone = info.get("phone")
+email = info.get("email", "No email provided")  <span class="comment"># Provide default value</span></div>
+    </div>
+
+    <div class="section">
+        <h2>String Formatting</h2>
+        <div class="explanation">
+            Python gives us two main ways to format strings. f-strings (newer style) are often cleaner to read, while .format() (older style) is useful when you need to reuse the same format multiple times.
+        </div>
+        <div class="code-block">
+name = "John"
+age = 30
+
+<span class="comment"># Method 1: f-strings (Python 3.6+)</span>
+formatted = <span class="string">f"Name: {name}, Age: {age}"</span>
+
+<span class="comment"># Method 2: str.format()</span>
+template = <span class="string">"Name: {}, Age: {}"</span>     <span class="comment"># {} are filled in order</span>
+formatted = template.format(name, age)   <span class="comment"># Same result!</span></div>
+    </div>
+
+    <div class="section">
+        <h2>Error Handling</h2>
+        <div class="explanation">
+            Error handling helps our code deal with problems gracefully. The finally block ALWAYS runs, even if there's a return statement in try or except blocks - this makes it perfect for cleanup operations!
+        </div>
+        <div class="code-block">
+<span class="keyword">def</span> save_appointment(appointment):
+    file = None
+    <span class="keyword">try</span>:
+        file = open("appointments.txt", "w")
+        file.write(str(appointment))
+        <span class="keyword">return</span> True  <span class="comment"># finally still runs!</span>
+    <span class="keyword">except</span> IOError <span class="keyword">as</span> e:
+        print(f"Couldn't save: {e}")
+        <span class="keyword">return</span> False
+    <span class="keyword">finally</span>:
+        <span class="comment"># This runs no matter what</span>
+        if file:
+            file.close()</div>
+    </div>
+
+    <div class="section">
+        <h2>Common String Methods</h2>
+        <div class="explanation">
+            In Python, we use the dot (.) operator to access methods and attributes of objects. When we have a string, Python knows to give us access to all string-related methods.
+        </div>
+        <div class="code-block">
+<span class="comment"># Example with a more realistic string:</span>
+text = "  John Doe, jane@email.com, 555-0123  "
+
+cleaned = text.strip()                    <span class="comment"># Remove whitespace</span>
+names = text.split(",")                   <span class="comment"># Split into ["John Doe", "jane@email.com", "555-0123"]</span>
+fixed = text.replace("Doe", "Smith")      <span class="comment"># Replace text</span>
+lower = text.lower()                      <span class="comment"># Convert to lowercase</span>
+upper = text.upper()                      <span class="comment"># Convert to uppercase</span></div>
+    </div>
+
+    <div class="section">
+        <h2>Input Validation Examples</h2>
+        <div class="explanation">
+            Regular expressions (regex) are a powerful way to validate text patterns. Don't worry too much about the pattern syntax - these are standard patterns for validating emails and phone numbers that you can use as-is!
+        </div>
+        <div class="code-block">
+<span class="keyword">import</span> re  <span class="comment"># Python's regex module</span>
+
+<span class="keyword">def</span> validate_phone(phone):
+    pattern = r'^\d{3}-\d{4}$'    <span class="comment"># Matches "555-0123"</span>
+    <span class="keyword">if not</span> re.match(pattern, phone):
+        <span class="keyword">raise</span> ValueError("Invalid phone format")
+
+<span class="keyword">def</span> validate_email(email):
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'    <span class="comment"># Matches "user@example.com"</span>
+    <span class="keyword">if not</span> re.match(pattern, email):
+        <span class="keyword">raise</span> ValueError("Invalid email format")</div>
+        
+        <div class="tip">
+            💡 These regex patterns are provided for you - you don't need to understand how to write them! Just know they help validate that strings match expected formats.
+        </div>
+    </div>
+</body>
+</html>
